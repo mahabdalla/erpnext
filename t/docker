@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  erpnext:
+    image: mitexleo/syserp:latest
+    container_name: erpnext
+    depends_on:
+      - db
+      - redis-cache
+      - redis-queue
+    environment:
+      # متغيرات البيئة لإعداد ERPNext
+      - DB_HOST=db
+      - REDIS_CACHE=redis-cache:6379
+      - REDIS_QUEUE=redis-queue:6379
+      - SITE_NAME=your-site-name.local
+      - ADMIN_PASSWORD=your-admin-password
+      - DB_ROOT_PASSWORD=your-db-root-password
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+    ports:
+      - "80:8000"
+
+  db:
+    image: mariadb:10.6
+    container_name: erpnext-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=your-db-root-password
+    volumes:
+      - db-data:/var/lib/mysql
+
+  redis-cache:
+    image: redis:6.2-alpine
+    container_name: erpnext-redis-cache
+    volumes:
+      - redis-cache-data:/data
+
+  redis-queue:
+    image: redis:6.2-alpine
+    container_name: erpnext-redis-queue
+    volumes:
+      - redis-queue-data:/data
+
+volumes:
+  sites:
+  db-data:
+  redis-cache-data:
+  redis-queue-data:
